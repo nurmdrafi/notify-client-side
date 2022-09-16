@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import toast, { Toaster } from "react-hot-toast";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import CreateNote from "../components/CreateNote";
 import NoteList from "../components/NoteList";
 import { useQuery } from "react-query";
+import useAuthUserContext from "../context/AuthUserContext";
+import Loading from "../components/Loading";
 
 const Home = () => {
+  const { authUser } = useAuthUserContext();
   const [modalIsOpen, setIsOpen] = useState(false);
   const {
     isLoading,
@@ -14,13 +18,15 @@ const Home = () => {
     error,
     refetch,
   } = useQuery("notes", () =>
-    fetch("http://localhost:5000/notes/notes").then((res) => res.json())
+    fetch("http://localhost:5000/notes/getAll").then((res) => res.json())
   );
   if (isLoading) {
-    return <h2>Loading...</h2>;
+    return <Loading />;
   }
   if (isError) {
-    return <h2>error.message</h2>;
+    toast.error(error.message, {
+      id: "signUp error",
+    });
   }
 
   // modal functionality
@@ -43,7 +49,12 @@ const Home = () => {
   };
   return (
     <div className="flex-col min-h-[calc(100vh-65px)] justify-center items-center">
-      <h1 className="text-center text-black text-3xl font-bold mb-3">Hello!</h1>
+      <div>
+        <Toaster position="top-center" reverseOrder={true} />
+      </div>
+      <h1 className="text-center text-black text-3xl font-bold mb-3">
+        Hello! {authUser.user.name}
+      </h1>
 
       {/* Create Note Button */}
       <div className="flex justify-center">
@@ -63,7 +74,7 @@ const Home = () => {
             <AiOutlineCloseCircle className="text-black text-2xl" />{" "}
           </button>
         </div>
-        <CreateNote closeModal={closeModal} refetch={refetch}/>
+        <CreateNote closeModal={closeModal} refetch={refetch} />
       </Modal>
       <NoteList notes={notes} refetch={refetch} />
     </div>

@@ -1,20 +1,26 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthUserContext from "../context/AuthUserContext";
+import toast, { Toaster } from "react-hot-toast";
 
 const Navbar = () => {
-  const { authUser, LogOut } = useAuthUserContext();
+  const { authUser, logOut } = useAuthUserContext();
   const navigate = useNavigate();
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
     try {
-      LogOut();
+      await logOut();
     } catch (err) {
-      console.log(err);
+      toast.error(err.message, {
+        id: "logOut error",
+      });
     }
     navigate("/login");
   };
   return (
     <div className="navbar lg:px-16 px-12 h-[65px]">
+      <div>
+        <Toaster position="top-center" reverseOrder={true} />
+      </div>
       <div className="flex-1">
         <Link className="text-2xl font-bold text-primary" to="/">
           Notify<span className="text-red-500 text-3xl">.</span>me
@@ -23,13 +29,13 @@ const Navbar = () => {
       <div className="flex items-center">
         {/* logout button */}
         <div className="flex items-center gap-2 text-black">
-          {authUser?.name && (
+          {authUser?.user?.name && (
             <div className="dropdown dropdown-end">
               <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 h-10 rounded-full shadow-md bg-primary">
-                  {authUser?.name && (
+                  {authUser.user.name && (
                     <span className="text-2xl pt-1 flex justify-center items-center text-white">
-                      {authUser?.name[0]}
+                      {authUser.user.name[0]}
                     </span>
                   )}
                 </div>

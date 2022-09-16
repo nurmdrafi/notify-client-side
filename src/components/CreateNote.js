@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 
 const CreateNote = ({ closeModal, refetch }) => {
@@ -9,7 +10,7 @@ const CreateNote = ({ closeModal, refetch }) => {
   const handleCreateNote = async (e) => {
     e.preventDefault();
     try {
-      await fetch("http://localhost:5000/notes/note", {
+      await fetch("http://localhost:5000/notes/post", {
         method: "POST",
         body: JSON.stringify({
           title: title,
@@ -25,11 +26,16 @@ const CreateNote = ({ closeModal, refetch }) => {
       closeModal();
       await refetch();
     } catch (err) {
-      console.log(err);
+      toast.error(err.message, {
+        id: "createNote error",
+      });
     }
   };
   return (
     <div className="bg-white">
+      <div>
+        <Toaster position="top-center" reverseOrder={true} />
+      </div>
       <form className=" flex flex-col gap-3 ">
         {/* Title */}
         <div className="form-control min-w-[350px] max-w-screen-lg">

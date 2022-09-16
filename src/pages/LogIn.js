@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 const Login = () => {
-  const { authUser } = useAuthUserContext();
+  const { logIn } = useAuthUserContext();
   const {
     register,
     handleSubmit,
@@ -13,7 +13,13 @@ const Login = () => {
   } = useForm();
 
   const handleLogin = async (data) => {
-    console.log(data);
+    try {
+      await logIn(data.email, data.password);
+    } catch (err) {
+      toast.error(err.message, {
+        id: "logIn error",
+      });
+    }
     reset();
   };
   return (

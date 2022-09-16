@@ -1,14 +1,13 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
-import { useEffect } from "react";
+import auth from "../firebase.init";
 
 const Register = () => {
-  const { authUser, LogIn } = useAuthUserContext();
-  const navigate = useNavigate();
-    console.log(authUser);
+  const { setIsLoading, signUp } = useAuthUserContext();
+
   const {
     register,
     handleSubmit,
@@ -23,32 +22,41 @@ const Register = () => {
         message: "Please confirm your password",
       });
     } else {
+      // signup
       try {
-        await fetch("http://localhost:5000/users/user", {
-          method: "POST",
-          body: JSON.stringify({
-            name: data.name,
-            email: data.email,
-            password: data.password,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        });
-        LogIn(data.name, data.email);
+        setIsLoading(true);
+        await signUp(data.name, data.email, data.password);
         reset();
       } catch (err) {
+        setIsLoading(false);
         toast.error(err.message, {
           id: "signUp error",
         });
+      } finally {
+        setIsLoading(false);
+      }
+      // save to database
+      if (auth.currentUser) {
+        try {
+          await fetch("http://localhost:5000/users/post", {
+            method: "POST",
+            body: JSON.stringify({
+              name: auth.currentUser.displayName,
+              email: auth.currentUser.email,
+              password: data.password,
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          });
+        } catch (err) {
+          toast.error(err.message, {
+            id: "signUp error",
+          });
+        }
       }
     }
   };
-  useEffect(() => {
-    if (authUser.name) {
-      navigate("/home");
-    }
-  }, [authUser, navigate]);
 
   return (
     <div className=" flex min-h-[calc(100vh-65px)] items-center justify-center">
