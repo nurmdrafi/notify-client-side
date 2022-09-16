@@ -1,18 +1,55 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import useAuthUserContext from "../context/AuthUserContext";
+import { useEffect } from "react";
 
 const Register = () => {
+  const { authUser, LogIn } = useAuthUserContext();
+  const navigate = useNavigate();
+    console.log(authUser);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
     reset,
   } = useForm();
   const handleRegistration = async (data) => {
-    console.log(data);
+    if (data.password !== data.confirmPassword) {
+      setError("confirmPassword", {
+        type: "match",
+        message: "Please confirm your password",
+      });
+    } else {
+      try {
+        await fetch("http://localhost:5000/users/user", {
+          method: "POST",
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        });
+        LogIn(data.name, data.email);
+        reset();
+      } catch (err) {
+        toast.error(err.message, {
+          id: "signUp error",
+        });
+      }
+    }
   };
+  useEffect(() => {
+    if (authUser.name) {
+      navigate("/home");
+    }
+  }, [authUser, navigate]);
+
   return (
     <div className=" flex min-h-[calc(100vh-65px)] items-center justify-center">
       <div>

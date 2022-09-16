@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import useAuthUserContext from "../context/AuthUserContext";
 
 const CreateNote = ({ closeModal, refetch }) => {
+  const { authUser } = useAuthUserContext();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -12,6 +14,7 @@ const CreateNote = ({ closeModal, refetch }) => {
         body: JSON.stringify({
           title: title,
           body: body,
+          email: authUser.email,
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",

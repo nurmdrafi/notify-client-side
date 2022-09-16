@@ -9,7 +9,7 @@ export const AuthUserContextProvider = ({ children }) => {
     name: null,
     email: null,
   });
-  function LogIn(name, email, password) {
+  function LogIn(name, email) {
     setAuthUser({
       name: name,
       email: email,

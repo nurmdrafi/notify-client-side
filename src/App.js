@@ -3,11 +3,15 @@ import { Routes, Route } from "react-router-dom";
 import LogIn from "./pages/LogIn";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import Navbar from "./components/Navbar";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
     <div>
+      <Navbar />
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/register" element={<Register />} />

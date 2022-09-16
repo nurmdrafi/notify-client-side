@@ -5,7 +5,6 @@ import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 const Login = () => {
   const { authUser } = useAuthUserContext();
-  console.log(authUser)
   const {
     register,
     handleSubmit,
