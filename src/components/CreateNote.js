@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const CreateNote = () => {
+const CreateNote = ({ closeModal, refetch }) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
@@ -17,12 +17,15 @@ const CreateNote = () => {
           "Content-type": "application/json; charset=UTF-8",
         },
       });
-    } catch (error) {
-      console.log(error);
+      setTitle("");
+      setBody("");
+      closeModal();
+      await refetch();
+    } catch (err) {
+      console.log(err);
     }
   };
   return (
-
     <div className="bg-white">
       <form className=" flex flex-col gap-3 ">
         {/* Title */}

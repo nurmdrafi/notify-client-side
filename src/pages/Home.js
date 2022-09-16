@@ -2,10 +2,28 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import CreateNote from "../components/CreateNote";
+import NoteList from "../components/NoteList";
+import { useQuery } from "react-query";
 
 const Home = () => {
-  // modal functionality
   const [modalIsOpen, setIsOpen] = useState(false);
+  const {
+    isLoading,
+    data: notes,
+    isError,
+    error,
+    refetch,
+  } = useQuery("notes", () =>
+    fetch("http://localhost:5000/notes/notes").then((res) => res.json())
+  );
+  if (isLoading) {
+    return <h2>Loading...</h2>;
+  }
+  if (isError) {
+    return <h2>error.message</h2>;
+  }
+
+  // modal functionality
   function openModal() {
     setIsOpen(true);
   }
@@ -45,8 +63,9 @@ const Home = () => {
             <AiOutlineCloseCircle className="text-black text-2xl" />{" "}
           </button>
         </div>
-        <CreateNote closeModal={closeModal} />
+        <CreateNote closeModal={closeModal} refetch={refetch}/>
       </Modal>
+      <NoteList notes={notes} refetch={refetch} />
     </div>
   );
 };
