@@ -3,34 +3,51 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
-const Login = () => {
+const Register = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm();
-
-  const handleLogin = async (data) => {
+  const handleRegistration = async (data) => {
     console.log(data);
-    reset();
   };
   return (
     <div className=" flex min-h-[calc(100vh-65px)] items-center justify-center">
       <div>
-        <Toaster />
+        <Toaster position="top-center" reverseOrder={true} />
       </div>
-      <div className="card  w-96 bg-base-100 drop-shadow-lg">
+      <div className="card w-96 bg-base-100 drop-shadow-lg">
         <div className="card-body items-center text-center">
-          <h2 className="card-title text-primary">Login</h2>
+          <h2 className="card-title text-primary">Register</h2>
+
           {/* Form Start */}
           <form
-            onSubmit={handleSubmit(handleLogin)}
+            onSubmit={handleSubmit(handleRegistration)}
             className=" flex flex-col gap-3 text-gray-800"
           >
+            {/* Name */}
+            <div className="form-control min-w-[350px]">
+              <label className="text-left  pb-1">Name</label>
+              <input
+                type="text"
+                className={`input input-bordered w-full bg-secondary ${
+                  errors.name && "input-error"
+                }`}
+                {...register("name", {
+                  required: "Please enter your name",
+                })}
+              />
+              {/* Error Message */}
+              <p className="text-error text-left pt-2">
+                {errors?.name?.message}
+              </p>
+            </div>
+
             {/* Email */}
             <div className="form-control min-w-[350px]">
-              <label className="text-left pb-1 ">Email</label>
+              <label className="text-left pb-1">Email</label>
               <input
                 type="text"
                 className={`input input-bordered w-full bg-secondary ${
@@ -45,14 +62,14 @@ const Login = () => {
                 })}
               />
               {/* Error Message */}
-              <p className="pt-2 text-left text-error">
+              <p className="text-error text-left pt-2">
                 {errors?.email?.message}
               </p>
             </div>
 
-            {/* Password */}
+            {/* Password*/}
             <div className="form-control min-w-[350px]">
-              <label className="text-left pb-1 ">Password</label>
+              <label className="text-left pb-1">Password</label>
               <input
                 type="password"
                 className={`input input-bordered w-full bg-secondary ${
@@ -86,8 +103,24 @@ const Login = () => {
                 })}
               />
               {/* Error Message */}
-              <p className="pt-2 text-left text-error">
+              <p className="text-error text-left">
                 {errors?.password?.message}
+              </p>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="form-control min-w-[350px]">
+              <label className="text-left pb-1">Confirm Password</label>
+              <input
+                type="password"
+                className={`input input-bordered w-full bg-secondary mb-2 ${
+                  errors.confirmPassword && "input-error"
+                }`}
+                {...register("confirmPassword")}
+              />
+              {/* Error Message */}
+              <p className="text-error text-left">
+                {errors?.confirmPassword?.message}
               </p>
             </div>
 
@@ -96,14 +129,15 @@ const Login = () => {
               type="submit"
               className="btn btn-active btn-primary text-white uppercase min-w-[350px]"
             >
-              Login
+              Register
             </button>
           </form>
           {/* Form End */}
+
           <p className="text-black">
-            New to Notify?{" "}
-            <Link to="/register" className="text-primary">
-              Create New Account
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary">
+              Log In here
             </Link>
           </p>
         </div>
@@ -112,4 +146,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
