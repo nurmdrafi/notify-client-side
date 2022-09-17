@@ -7,6 +7,7 @@ import NoteList from "../components/NoteList";
 import { useQuery } from "react-query";
 import useAuthUserContext from "../context/AuthUserContext";
 import Loading from "../components/Loading";
+import { getByEmail } from "../utils/APIs";
 
 const Home = () => {
   const { authUser } = useAuthUserContext();
@@ -17,15 +18,24 @@ const Home = () => {
     isError,
     error,
     refetch,
-  } = useQuery("notes", () =>
-    fetch("http://localhost:5000/notes/getAll").then((res) => res.json())
+  } = useQuery(
+    "notes",
+    () => authUser.user.email && getByEmail(authUser.user.email)
   );
+
+  // refetch again if notes undefined
+  if (!notes) {
+    refetch();
+  }
+
   if (isLoading) {
     return <Loading />;
   }
+
+  // fetch error handling
   if (isError) {
     toast.error(error.message, {
-      id: "signUp error",
+      id: "getByEmail error",
     });
   }
 
@@ -67,7 +77,7 @@ const Home = () => {
         onRequestClose={closeModal}
         style={customStyles}
         ariaHideApp={false}
-        contentLabel="Create Post Modal"
+        contentLabel="Create Note Modal"
       >
         <div className="flex justify-end mb-5">
           <button onClick={closeModal}>
@@ -76,7 +86,8 @@ const Home = () => {
         </div>
         <CreateNote closeModal={closeModal} refetch={refetch} />
       </Modal>
-      <NoteList notes={notes} refetch={refetch} />
+      {/* if notes available then pass props */}
+      {notes && <NoteList notes={notes} refetch={refetch} />}
     </div>
   );
 };

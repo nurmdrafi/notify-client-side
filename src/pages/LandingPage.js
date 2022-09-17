@@ -19,7 +19,7 @@ const LandingPage = () => {
             </Link>
           </div>
         ) : (
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center mt-5">
             <Link to="/home">
               <button className="btn btn-primary btn-outline">
                 Go To Home Page

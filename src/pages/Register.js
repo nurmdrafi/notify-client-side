@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import auth from "../firebase.init";
+import { createNewUser } from "../utils/APIs";
 
 const Register = () => {
   const { setIsLoading, signUp } = useAuthUserContext();
@@ -38,20 +39,15 @@ const Register = () => {
       // save to database
       if (auth.currentUser) {
         try {
-          await fetch("http://localhost:5000/users/post", {
-            method: "POST",
-            body: JSON.stringify({
-              name: auth.currentUser.displayName,
-              email: auth.currentUser.email,
-              password: data.password,
-            }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8",
-            },
-          });
+          const newUser = {
+            name: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+            password: data.password,
+          };
+          await createNewUser(newUser);
         } catch (err) {
           toast.error(err.message, {
-            id: "signUp error",
+            id: "createDBUser error",
           });
         }
       }

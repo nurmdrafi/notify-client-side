@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
+import { createNewNote } from "../utils/APIs";
 
 const CreateNote = ({ closeModal, refetch }) => {
   const { authUser } = useAuthUserContext();
@@ -10,21 +11,16 @@ const CreateNote = ({ closeModal, refetch }) => {
   const handleCreateNote = async (e) => {
     e.preventDefault();
     try {
-      await fetch("http://localhost:5000/notes/post", {
-        method: "POST",
-        body: JSON.stringify({
-          title: title,
-          body: body,
-          email: authUser.email,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      });
+      const newNote = {
+        title: title,
+        body: body,
+        email: authUser.user.email,
+      };
+      await createNewNote(newNote);
       setTitle("");
       setBody("");
       closeModal();
-      await refetch();
+      refetch();
     } catch (err) {
       toast.error(err.message, {
         id: "createNote error",
