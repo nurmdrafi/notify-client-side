@@ -7,7 +7,7 @@ import NoteList from "../components/NoteList";
 import { useQuery } from "react-query";
 import useAuthUserContext from "../context/AuthUserContext";
 import Loading from "../components/Loading";
-import { getByEmail } from "../utils/APIs";
+import { getByEmail } from "../network/apis/note";
 
 const Home = () => {
   const { authUser } = useAuthUserContext();

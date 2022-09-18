@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import auth from "../firebase.init";
-import { createNewUser } from "../utils/APIs";
+import { createNewUser } from "../network/apis/user";
+import { getToken } from "../network/apis/auth";
 
 const Register = () => {
-  const { setIsLoading, signUp } = useAuthUserContext();
+  const { setIsLoading, signUp, setAuthUser } = useAuthUserContext();
 
   const {
     register,
@@ -30,6 +31,7 @@ const Register = () => {
         reset();
       } catch (err) {
         setIsLoading(false);
+        setAuthUser({});
         toast.error(err.message, {
           id: "signUp error",
         });
@@ -38,16 +40,30 @@ const Register = () => {
       }
       // save to database
       if (auth.currentUser) {
+        const userInfo = {
+          name: auth.currentUser.displayName,
+          email: auth.currentUser.email,
+          password: data.password,
+        };
         try {
-          const newUser = {
-            name: auth.currentUser.displayName,
-            email: auth.currentUser.email,
-            password: data.password,
-          };
-          await createNewUser(newUser);
+          await createNewUser(userInfo);
         } catch (err) {
           toast.error(err.message, {
             id: "createDBUser error",
+          });
+        }
+        try {
+          const res = await getToken(userInfo);
+          if (res) {
+            localStorage.setItem("accessToken", res.data);
+            console.log(res.data);
+          }
+        } catch (err) {
+          console.log(err.message);
+          localStorage.removeItem("accessToken");
+          setAuthUser({});
+          toast.error(err.message, {
+            id: "getToken error",
           });
         }
       }

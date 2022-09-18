@@ -1,6 +1,6 @@
 import React from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { deleteNoteById } from "../utils/APIs";
+import { deleteNoteById } from "../network/apis/note";
 
 const Note = ({ note, refetch }) => {
   const handleDeleteNote = async (id) => {

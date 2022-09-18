@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
-import { createNewNote } from "../utils/APIs";
+import { createNewNote } from "../network/apis/note";
 
 const CreateNote = ({ closeModal, refetch }) => {
   const { authUser } = useAuthUserContext();
@@ -20,7 +20,6 @@ const CreateNote = ({ closeModal, refetch }) => {
       setTitle("");
       setBody("");
       closeModal();
-      refetch();
     } catch (err) {
       toast.error(err.message, {
         id: "createNote error",

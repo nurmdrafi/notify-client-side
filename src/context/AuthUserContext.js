@@ -16,6 +16,7 @@ const AuthUserContext = createContext();
 
 export const AuthUserContextProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState({ user: {} });
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -33,10 +34,6 @@ export const AuthUserContextProvider = ({ children }) => {
 
   function logIn(email, password) {
     return signInWithEmailAndPassword(auth, email, password);
-  }
-  function updateDisplayName(name) {
-    updateProfile(auth?.currentUser, { displayName: name });
-    return;
   }
 
   function logOut() {
@@ -70,9 +67,10 @@ export const AuthUserContextProvider = ({ children }) => {
         isLoading,
         setIsLoading,
         signUp,
-        updateDisplayName,
         logIn,
         logOut,
+        error,
+        setError,
       }}
     >
       {children}
