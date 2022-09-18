@@ -1,7 +1,7 @@
-import axiosPublic from "../axiosPublic";
+import instance from "../AxiosInterceptor";
 
 // create new user
 export async function createNewUser(userInfo) {
-  const res = await axiosPublic.post("/user/post", userInfo);
+  const res = await instance.post("/user/post", userInfo);
   return res.data;
 }

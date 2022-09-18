@@ -1,7 +1,7 @@
-import axiosPublic from "../axiosPublic";
+import instance from "../AxiosInterceptor";
 
 export async function getToken(email, password) {
-  const res = await axiosPublic.post("/auth/token", {
+  const res = await instance.post("/auth/token", {
     email: email,
     password: password,
   });
