@@ -10,7 +10,6 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import auth from "../firebase.init";
-import { useNavigate } from "react-router-dom";
 
 const AuthUserContext = createContext();
 
@@ -18,7 +17,6 @@ export const AuthUserContextProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState({ user: {} });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   async function signUp(name, email, password) {
     await createUserWithEmailAndPassword(auth, email, password).then(() =>
@@ -37,7 +35,10 @@ export const AuthUserContextProvider = ({ children }) => {
   }
 
   function logOut() {
-    return signOut(auth).then(() => setAuthUser({}));
+    return signOut(auth).then(() => {
+      setAuthUser({});
+      localStorage.removeItem("accessToken");
+    });
   }
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export const AuthUserContextProvider = ({ children }) => {
             email: currentUser.email,
           },
         });
-        navigate("/home");
+        // navigate("/home");
       } else {
         setAuthUser({});
       }

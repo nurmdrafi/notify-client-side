@@ -23,3 +23,9 @@ export async function deleteNoteById(id) {
   const res = await axiosPublic.delete(`/note/delete/${id}`);
   return res.data;
 }
+
+// update note
+export async function updateNote(id, updatedNote) {
+  const res = await axiosPublic.patch(`/note/update/${id}`, updatedNote);
+  return res.data;
+}

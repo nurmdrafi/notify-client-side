@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import auth from "../firebase.init";
@@ -9,7 +9,7 @@ import { getToken } from "../network/apis/auth";
 
 const Register = () => {
   const { setIsLoading, signUp, setAuthUser } = useAuthUserContext();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -53,13 +53,12 @@ const Register = () => {
           });
         }
         try {
-          const res = await getToken(userInfo);
+          const res = await getToken(userInfo.email, userInfo.password);
           if (res) {
             localStorage.setItem("accessToken", res.data);
-            console.log(res.data);
+            navigate("/home");
           }
         } catch (err) {
-          console.log(err.message);
           localStorage.removeItem("accessToken");
           setAuthUser({});
           toast.error(err.message, {

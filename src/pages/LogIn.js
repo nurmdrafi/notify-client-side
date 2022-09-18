@@ -1,10 +1,12 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
+import { getToken } from "../network/apis/auth";
 const Login = () => {
   const { logIn } = useAuthUserContext();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -15,6 +17,17 @@ const Login = () => {
   const handleLogin = async (data) => {
     try {
       await logIn(data.email, data.password);
+      try {
+        const res = await getToken(data.email, data.password);
+        if (res) {
+          localStorage.setItem("accessToken", res.data);
+          navigate("/home");
+        }
+      } catch (err) {
+        toast.error(err.message, {
+          id: "getToken error",
+        });
+      }
     } catch (err) {
       toast.error(err.message, {
         id: "logIn error",

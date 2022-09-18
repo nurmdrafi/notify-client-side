@@ -1,24 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import { createNewNote } from "../network/apis/note";
 
 const CreateNote = ({ closeModal, refetch }) => {
   const { authUser } = useAuthUserContext();
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const handleCreateNote = async (e) => {
-    e.preventDefault();
+  const handleCreateNote = async (data) => {
+    let now = new Date();
+    const newNote = {
+      title: data.title,
+      body: data.body,
+      email: authUser.user.email,
+      time: now.toUTCString(),
+    };
     try {
-      const newNote = {
-        title: title,
-        body: body,
-        email: authUser.user.email,
-      };
-      await createNewNote(newNote);
-      setTitle("");
-      setBody("");
+      await createNewNote(newNote).then(() => {
+        refetch();
+      });
       closeModal();
     } catch (err) {
       toast.error(err.message, {
@@ -31,16 +36,23 @@ const CreateNote = ({ closeModal, refetch }) => {
       <div>
         <Toaster position="top-center" reverseOrder={true} />
       </div>
-      <form className=" flex flex-col gap-3 ">
+      <form
+        className=" flex flex-col gap-3"
+        onSubmit={handleSubmit(handleCreateNote)}
+      >
         {/* Title */}
         <div className="form-control min-w-[350px] max-w-screen-lg">
           <input
             type="text"
             name="title"
-            onChange={(e) => setTitle(e.target.value)}
             placeholder="Your Title"
             className="input input-bordered w-full text-black bg-secondary"
+            {...register("title", {
+              required: "Please enter your title",
+            })}
           />
+          {/* Error Message */}
+          <p className="text-error text-left pt-2">{errors?.title?.message}</p>
         </div>
 
         {/* Body */}
@@ -48,17 +60,20 @@ const CreateNote = ({ closeModal, refetch }) => {
           <textarea
             type="text"
             name="body"
-            onChange={(e) => setBody(e.target.value)}
             placeholder="Your Note"
             className="textarea textarea-bordered w-full text-black bg-secondary"
+            {...register("body", {
+              required: "Please type your note",
+            })}
           />
+          {/* Error Message */}
+          <p className="text-error text-left pt-2">{errors?.body?.message}</p>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
           className="btn btn-active btn-primary text-white uppercase min-w-[350px] max-w-screen-lg"
-          onClick={handleCreateNote}
         >
           Submit
         </button>
