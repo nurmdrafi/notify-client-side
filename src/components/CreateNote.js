@@ -2,26 +2,33 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
-import { createNewNote } from "../network/apis/note";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const CreateNote = ({ closeModal, refetch }) => {
   const { authUser } = useAuthUserContext();
+  const axiosPrivate = useAxiosPrivate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  // create new note
+  const createNewNote = async (newNote) => {
+    const res = await axiosPrivate.post("/note/post", newNote);
+    return res.data;
+  };
+
   const handleCreateNote = async (data) => {
     let now = new Date();
     const newNote = {
       title: data.title,
       body: data.body,
-      email: authUser.user.email,
+      email: authUser.email,
       time: now.toUTCString(),
     };
     try {
-      await createNewNote(newNote).then(() => {
+      createNewNote(newNote).then(() => {
         refetch();
       });
       closeModal();

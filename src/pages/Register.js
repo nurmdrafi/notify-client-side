@@ -4,12 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import auth from "../firebase.init";
-import { createNewUser } from "../network/apis/user";
-import { getToken } from "../network/apis/auth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const Register = () => {
   const { setIsLoading, signUp, setAuthUser } = useAuthUserContext();
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
   const {
     register,
     handleSubmit,
@@ -17,6 +17,22 @@ const Register = () => {
     setError,
     reset,
   } = useForm();
+
+  // create new user
+  const createNewUser = async (userInfo) => {
+    const res = await axiosPrivate.post("/user/post", userInfo);
+    return res.data;
+  };
+
+  // get token
+  const getToken = async (email, password) => {
+    const res = await axiosPrivate.post("/auth/token", {
+      email: email,
+      password: password,
+    });
+    return res.data;
+  };
+
   const handleRegistration = async (data) => {
     if (data.password !== data.confirmPassword) {
       setError("confirmPassword", {
@@ -31,13 +47,13 @@ const Register = () => {
         reset();
       } catch (err) {
         setIsLoading(false);
-        setAuthUser({});
         toast.error(err.message, {
           id: "signUp error",
         });
       } finally {
         setIsLoading(false);
       }
+
       // save to database
       if (auth.currentUser) {
         const userInfo = {
@@ -52,15 +68,22 @@ const Register = () => {
             id: "createDBUser error",
           });
         }
+
+        // get token
         try {
           const res = await getToken(userInfo.email, userInfo.password);
           if (res) {
-            localStorage.setItem("accessToken", res.accessToken);
+            console.log(res, "register");
+            setAuthUser((prev) => {
+              return {
+                ...prev,
+                accessToken: res.accessToken,
+              };
+            });
             navigate("/home");
           }
         } catch (err) {
-          localStorage.removeItem("accessToken");
-          setAuthUser({});
+          setAuthUser(null);
           toast.error(err.message, {
             id: "getToken error",
           });

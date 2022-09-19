@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { useContext } from "react";
-import { createContext } from "react";
+import React, { useEffect, useState, useContext, createContext } from "react";
 
 import {
   createUserWithEmailAndPassword,
@@ -10,57 +8,67 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import auth from "../firebase.init";
+import { useNavigate } from "react-router-dom";
+import axios from "../api/axios";
 
 const AuthUserContext = createContext();
 
 export const AuthUserContextProvider = ({ children }) => {
-  const [authUser, setAuthUser] = useState({ user: {} });
+  const [authUser, setAuthUser] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  async function signUp(name, email, password) {
-    await createUserWithEmailAndPassword(auth, email, password).then(() =>
-      updateProfile(auth.currentUser, { displayName: name })
-    );
-    setAuthUser({
-      user: {
-        name: name,
-        email: email,
-      },
-    });
+  function signUp(name, email, password) {
+    return createUserWithEmailAndPassword(auth, email, password)
+      .then(() =>
+        updateProfile(auth.currentUser, { displayName: name }).then(() =>
+          setAuthUser({ name: name, email: email })
+        )
+      )
+      .catch(() => {
+        setAuthUser(null);
+      });
   }
 
   function logIn(email, password) {
     return signInWithEmailAndPassword(auth, email, password);
+    // after login setAuthUser will set by onAuthStateChanged method
   }
 
   function logOut() {
     return signOut(auth).then(() => {
-      setAuthUser({});
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      setAuthUser(null);
     });
   }
 
+  // keep connected with firebase auth provider, onMount track auth user exist or not
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        setAuthUser({
-          user: {
-            name: currentUser.displayName,
-            email: currentUser.email,
-          },
-        });
-        // navigate("/home");
+        function getToken() {
+          axios
+            .get("/auth/refresh", {
+              withCredentials: true,
+            })
+            .then((res) => {
+              setAuthUser({
+                name: currentUser.displayName,
+                email: currentUser.email,
+                accessToken: res?.data?.accessToken,
+              });
+              navigate("/home");
+            });
+        }
+        getToken();
       } else {
-        setAuthUser({});
+        setAuthUser(null);
       }
     });
     return () => {
       unsubscribe();
     };
   }, []);
-
   return (
     <AuthUserContext.Provider
       value={{

@@ -2,19 +2,33 @@ import React from "react";
 import { useState } from "react";
 import { AiOutlineClose, AiOutlineEdit } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
-
 import Swal from "sweetalert2";
-import { deleteNoteById, updateNote } from "../network/apis/note";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const Note = ({ note, refetch }) => {
   const [isEditable, setIsEditable] = useState(false);
   const [title, setTitle] = useState(note.title);
   const [body, setBody] = useState(note.body);
+  const axiosPrivate = useAxiosPrivate();
+
+  // delete note by id
+  const deleteNoteById = async (id) => {
+    const res = await axiosPrivate.delete(`/note/delete/${id}`);
+    return res.data;
+  };
+
+  // update note
+  const updateNote = async (id, updatedNote) => {
+    const res = await axiosPrivate.patch(`/note/update/${id}`, updatedNote);
+    return res.data;
+  };
+
   const handleDeleteNote = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
       icon: "warning",
+      backdrop: "#3085d6",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",

@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { BrowserRouter } from "react-router-dom";
 import { AuthUserContextProvider } from "./context/AuthUserContext";
-import { AxiosInterceptor } from "./network/AxiosInterceptor";
 const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -15,9 +14,7 @@ root.render(
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <AuthUserContextProvider>
-          <AxiosInterceptor>
-            <App />
-          </AxiosInterceptor>
+          <App />
         </AuthUserContextProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       </QueryClientProvider>

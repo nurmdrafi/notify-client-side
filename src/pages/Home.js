@@ -7,21 +7,26 @@ import NoteList from "../components/NoteList";
 import { useQuery } from "react-query";
 import useAuthUserContext from "../context/AuthUserContext";
 import Loading from "../components/Loading";
-import { getByEmail } from "../network/apis/note";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const Home = () => {
   const { authUser } = useAuthUserContext();
+  const axiosPrivate = useAxiosPrivate();
   const [modalIsOpen, setIsOpen] = useState(false);
+
+  // get all notes by userEmail
+  async function getByEmail(email) {
+    const res = await axiosPrivate.get(`/note/getByEmail/${email}`);
+    return res.data;
+  }
+
   const {
     isLoading,
     data: notes,
     isError,
     error,
     refetch,
-  } = useQuery(
-    "notes",
-    () => authUser.user.email && getByEmail(authUser.user.email)
-  );
+  } = useQuery("notes", () => authUser?.email && getByEmail(authUser.email));
 
   // refetch again if notes undefined
   if (!notes) {
@@ -63,7 +68,7 @@ const Home = () => {
         <Toaster position="top-center" reverseOrder={true} />
       </div>
       <h1 className="text-center text-black text-3xl font-bold mb-3">
-        Hello! {authUser.user.name}
+        Hello! {authUser.name}
       </h1>
 
       {/* Create Note Button */}

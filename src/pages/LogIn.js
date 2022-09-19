@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
-import { getToken } from "../network/apis/auth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 const Login = () => {
-  const { logIn } = useAuthUserContext();
+  const { logIn, setAuthUser } = useAuthUserContext();
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
   const {
     register,
     handleSubmit,
@@ -14,22 +15,38 @@ const Login = () => {
     reset,
   } = useForm();
 
+  // get token
+  const getToken = async (email, password) => {
+    const res = await axiosPrivate.post("/auth/token", {
+      email: email,
+      password: password,
+    });
+    return res.data;
+  };
+
   const handleLogin = async (data) => {
     try {
       await logIn(data.email, data.password);
       try {
         const res = await getToken(data.email, data.password);
         if (res) {
-          localStorage.setItem("accessToken", res.accessToken);
-          localStorage.setItem("refreshToken", res.refreshToken);
+          console.log(res, "login");
+          setAuthUser((prev) => {
+            return {
+              ...prev,
+              accessToken: res.accessToken,
+            };
+          });
           navigate("/home");
         }
       } catch (err) {
+        setAuthUser(null);
         toast.error(err.message, {
           id: "getToken error",
         });
       }
     } catch (err) {
+      setAuthUser(null);
       toast.error(err.message, {
         id: "logIn error",
       });
