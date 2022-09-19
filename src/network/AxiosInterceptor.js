@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import useAuthUserContext from "../context/AuthUserContext";
 
 const instance = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://aqueous-sea-71666.herokuapp.com",
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -53,6 +53,7 @@ export function AxiosInterceptor({ children }) {
           return Promise.reject(error);
         }
         instance.interceptors.response.eject(responseInterceptor);
+
         return instance
           .post("/auth/refresh", {
             refreshToken: localStorage.getItem("refreshToken"),
