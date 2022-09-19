@@ -55,7 +55,7 @@ const Register = () => {
         try {
           const res = await getToken(userInfo.email, userInfo.password);
           if (res) {
-            localStorage.setItem("accessToken", res.data);
+            localStorage.setItem("accessToken", res.accessToken);
             navigate("/home");
           }
         } catch (err) {

@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { AiOutlineEdit } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineEdit } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
 import Swal from "sweetalert2";
@@ -31,9 +31,6 @@ const Note = ({ note, refetch }) => {
     });
   };
 
-  const handleIsEditable = () => {
-    setIsEditable(true);
-  };
   const handleSaveNote = () => {
     setIsEditable(false);
     Swal.fire({
@@ -43,7 +40,6 @@ const Note = ({ note, refetch }) => {
       confirmButtonText: "Save",
       denyButtonText: `Don't save`,
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         try {
           const updatedNote = {
@@ -65,16 +61,27 @@ const Note = ({ note, refetch }) => {
   return (
     <div className="card mx-10 mb-10 bg-base-100 shadow-md rounded-none p-6 space-y-3">
       <div className="flex justify-end">
-        <AiOutlineEdit
-          onClick={() => handleIsEditable(note._id)}
-          className="text-primary text-2xl cursor-pointer"
-        />
+        {isEditable ? (
+          <AiOutlineClose
+            className="text-primary text-2xl cursor-pointer"
+            onClick={() => setIsEditable(false)}
+          />
+        ) : (
+          <AiOutlineEdit
+            onClick={() => {
+              setIsEditable(true);
+              setTitle(note.title);
+              setBody(note.body);
+            }}
+            className="text-primary text-2xl cursor-pointer"
+          />
+        )}
       </div>
       {isEditable ? (
         <>
           <input
             type="text"
-            className="text-primary text-2xl font-bold uppercase input p-0 input-bordered"
+            className="text-primary text-2xl font-bold capitalize input p-0 input-bordered"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -82,17 +89,17 @@ const Note = ({ note, refetch }) => {
             type="text"
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            className="text-black textarea textarea-bordered p-0"
+            className="text-black capitalize textarea textarea-bordered p-0"
           >
             {note.body}
           </textarea>
         </>
       ) : (
         <>
-          <h2 className="text-primary text-2xl font-bold uppercase">
+          <h2 className="text-primary capitalize text-2xl font-bold">
             {note.title}
           </h2>
-          <p className="text-black">{note.body}</p>
+          <p className="text-black capitalize">{note.body}</p>
         </>
       )}
 

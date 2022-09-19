@@ -5,9 +5,8 @@ import useAuthUserContext from "../context/AuthUserContext";
 const RequireAuth = ({ children }) => {
   const { authUser } = useAuthUserContext();
   const location = useLocation();
-  const token = localStorage.getItem("accessToken");
 
-  if (authUser.user && token) {
+  if (authUser.user) {
     return children;
   } else {
     return (

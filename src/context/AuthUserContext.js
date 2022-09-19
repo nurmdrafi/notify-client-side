@@ -38,6 +38,7 @@ export const AuthUserContextProvider = ({ children }) => {
     return signOut(auth).then(() => {
       setAuthUser({});
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     });
   }
 

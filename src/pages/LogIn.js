@@ -20,7 +20,8 @@ const Login = () => {
       try {
         const res = await getToken(data.email, data.password);
         if (res) {
-          localStorage.setItem("accessToken", res.data);
+          localStorage.setItem("accessToken", res.accessToken);
+          localStorage.setItem("refreshToken", res.refreshToken);
           navigate("/home");
         }
       } catch (err) {
