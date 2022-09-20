@@ -6,7 +6,7 @@ const RequireAuth = ({ children }) => {
   const { authUser } = useAuthUserContext();
   const location = useLocation();
 
-  if (authUser?.accessToken) {
+  if (authUser?.email) {
     return children;
   } else {
     return (

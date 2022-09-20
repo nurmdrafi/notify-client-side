@@ -9,7 +9,6 @@ import {
 } from "firebase/auth";
 import auth from "../firebase.init";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/axios";
 
 const AuthUserContext = createContext();
 
@@ -46,21 +45,12 @@ export const AuthUserContextProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        function getToken() {
-          axios
-            .get("/auth/refresh", {
-              withCredentials: true,
-            })
-            .then((res) => {
-              setAuthUser({
-                name: currentUser.displayName,
-                email: currentUser.email,
-                accessToken: res?.data?.accessToken,
-              });
-              navigate("/home");
-            });
-        }
-        getToken();
+        setAuthUser({
+          name: currentUser.displayName,
+          email: currentUser.email,
+          accessToken: localStorage.getItem("accessToken"),
+        });
+        navigate("/home");
       } else {
         setAuthUser(null);
       }

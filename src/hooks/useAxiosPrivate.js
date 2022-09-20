@@ -11,7 +11,9 @@ const useAxiosPrivate = () => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
         if (!config.headers["authorization"]) {
-          config.headers["authorization"] = `Bearer ${authUser?.accessToken}`;
+          config.headers["authorization"] = `Bearer ${localStorage.getItem(
+            "accessToken"
+          )}`;
         }
         return config;
       },

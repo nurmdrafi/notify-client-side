@@ -9,6 +9,7 @@ const Navbar = () => {
   const handleLogOut = async () => {
     try {
       await logOut();
+      localStorage.removeItem("accessToken");
       navigate("/login");
     } catch (err) {
       toast.error(err.message, {
@@ -29,7 +30,7 @@ const Navbar = () => {
       <div className="flex items-center">
         {/* logout button */}
         <div className="flex items-center gap-2 text-black">
-          {authUser?.accessToken && (
+          {authUser?.email && (
             <div className="dropdown dropdown-end">
               <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 h-10 rounded-full shadow-md bg-primary">

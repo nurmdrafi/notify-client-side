@@ -73,13 +73,13 @@ const Register = () => {
         try {
           const res = await getToken(userInfo.email, userInfo.password);
           if (res) {
-            console.log(res, "register");
             setAuthUser((prev) => {
               return {
                 ...prev,
                 accessToken: res.accessToken,
               };
             });
+            localStorage.setItem("accessToken", res.accessToken);
             navigate("/home");
           }
         } catch (err) {

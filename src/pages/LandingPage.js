@@ -9,7 +9,7 @@ const LandingPage = () => {
         <h1 className="text-primary font-bold text-center text-7xl">
           You can note anything...
         </h1>
-        {!authUser?.accessToken ? (
+        {!authUser?.email ? (
           <div className="flex justify-center gap-5 mt-5">
             <Link to="/login">
               <button className="btn btn-primary btn-outline ">Login</button>

@@ -30,13 +30,13 @@ const Login = () => {
       try {
         const res = await getToken(data.email, data.password);
         if (res) {
-          console.log(res, "login");
-          setAuthUser((prev) => {
-            return {
-              ...prev,
-              accessToken: res.accessToken,
-            };
-          });
+          // setAuthUser((prev) => {
+          //   return {
+          //     ...prev,
+          //     accessToken: res.accessToken,
+          //   };
+          // });
+          localStorage.setItem("accessToken", res.accessToken);
           navigate("/home");
         }
       } catch (err) {
