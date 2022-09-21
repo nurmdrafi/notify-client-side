@@ -5,16 +5,19 @@ const useRefreshToken = () => {
   const { setAuthUser } = useAuthUserContext();
 
   const refresh = async () => {
-    const response = await axios.get("/auth/refresh", {
-      withCredentials: true,
-    });
-    setAuthUser((prev) => {
-      return {
-        ...prev,
+    try {
+      const response = await axios.get("/auth/refresh", {
+        withCredentials: true,
+      });
+      setAuthUser({
+        username: response.data.username,
+        email: response.data.username,
         accessToken: response.data.accessToken,
-      };
-    });
-    return response.data.accessToken;
+      });
+      return response.data.accessToken;
+    } catch (error) {
+      console.log("error refresh token");
+    }
   };
   return refresh;
 };

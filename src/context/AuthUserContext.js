@@ -1,14 +1,6 @@
 import React, { useEffect, useState, useContext, createContext } from "react";
-
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
-import auth from "../firebase.init";
 import { useNavigate } from "react-router-dom";
+import axios from "../api/axios.js";
 
 const AuthUserContext = createContext();
 
@@ -18,47 +10,27 @@ export const AuthUserContextProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  function signUp(name, email, password) {
-    return createUserWithEmailAndPassword(auth, email, password)
-      .then(() =>
-        updateProfile(auth.currentUser, { displayName: name }).then(() =>
-          setAuthUser({ name: name, email: email })
-        )
-      )
-      .catch(() => {
-        setAuthUser(null);
-      });
-  }
-
-  function logIn(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-    // after login setAuthUser will set by onAuthStateChanged method
-  }
-
-  function logOut() {
-    return signOut(auth).then(() => {
-      setAuthUser(null);
-    });
-  }
-
-  // keep connected with firebase auth provider, onMount track auth user exist or not
+  // regenerate new token onMount
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setAuthUser({
-          name: currentUser.displayName,
-          email: currentUser.email,
-          accessToken: localStorage.getItem("accessToken"),
-        });
-        navigate("/home");
-      } else {
-        setAuthUser(null);
-      }
-    });
-    return () => {
-      unsubscribe();
+    const refresh = async () => {
+      try {
+        await axios
+          .get("/auth/refresh", {
+            withCredentials: true,
+          })
+          .then((res) => {
+            setAuthUser({
+              username: res.data.username,
+              email: res.data.username,
+              accessToken: res.data.accessToken,
+            });
+            navigate("/home");
+          });
+      } catch (error) {}
     };
+    refresh();
   }, []);
+
   return (
     <AuthUserContext.Provider
       value={{
@@ -66,11 +38,6 @@ export const AuthUserContextProvider = ({ children }) => {
         setAuthUser,
         isLoading,
         setIsLoading,
-        signUp,
-        logIn,
-        logOut,
-        error,
-        setError,
       }}
     >
       {children}

@@ -2,17 +2,23 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthUserContext from "../context/AuthUserContext";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "../api/axios";
 
 const Navbar = () => {
-  const { authUser, logOut } = useAuthUserContext();
+  const { authUser, setAuthUser } = useAuthUserContext();
   const navigate = useNavigate();
+
+  const logout = async () => {
+    const res = await axios.get("/auth/logout");
+    return res.data;
+  };
   const handleLogOut = async () => {
     try {
-      await logOut();
-      localStorage.removeItem("accessToken");
+      await logout();
+      setAuthUser({});
       navigate("/login");
     } catch (err) {
-      toast.error(err.message, {
+      toast.error(err.response?.data?.message, {
         id: "logOut error",
       });
     }
@@ -34,9 +40,9 @@ const Navbar = () => {
             <div className="dropdown dropdown-end">
               <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 h-10 rounded-full shadow-md bg-primary">
-                  {authUser.name && (
+                  {authUser.username && (
                     <span className="text-2xl pt-1 flex justify-center items-center text-white">
-                      {authUser.name[0]}
+                      {authUser.username[0]}
                     </span>
                   )}
                 </div>

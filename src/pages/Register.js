@@ -3,13 +3,11 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
-import auth from "../firebase.init";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import axios from "../api/axios";
 
 const Register = () => {
-  const { setIsLoading, signUp, setAuthUser } = useAuthUserContext();
+  const { setIsLoading } = useAuthUserContext();
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
   const {
     register,
     handleSubmit,
@@ -20,16 +18,7 @@ const Register = () => {
 
   // create new user
   const createNewUser = async (userInfo) => {
-    const res = await axiosPrivate.post("/user/post", userInfo);
-    return res.data;
-  };
-
-  // get token
-  const getToken = async (email, password) => {
-    const res = await axiosPrivate.post("/auth/token", {
-      email: email,
-      password: password,
-    });
+    const res = await axios.post("/auth/register", userInfo);
     return res.data;
   };
 
@@ -40,54 +29,30 @@ const Register = () => {
         message: "Please confirm your password",
       });
     } else {
-      // signup
+      // create new user / register
+      const userInfo = {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      };
+
       try {
         setIsLoading(true);
-        await signUp(data.name, data.email, data.password);
+        const res = await createNewUser(userInfo);
         reset();
+        // show success message
+        // test.success();
+        console.log(res);
+        if (res) {
+          navigate("/login");
+        }
       } catch (err) {
-        setIsLoading(false);
-        toast.error(err.message, {
+        toast.error(err.response?.data?.message, {
           id: "signUp error",
         });
+        setIsLoading(false);
       } finally {
         setIsLoading(false);
-      }
-
-      // save to database
-      if (auth.currentUser) {
-        const userInfo = {
-          name: auth.currentUser.displayName,
-          email: auth.currentUser.email,
-          password: data.password,
-        };
-        try {
-          await createNewUser(userInfo);
-        } catch (err) {
-          toast.error(err.message, {
-            id: "createDBUser error",
-          });
-        }
-
-        // get token
-        try {
-          const res = await getToken(userInfo.email, userInfo.password);
-          if (res) {
-            setAuthUser((prev) => {
-              return {
-                ...prev,
-                accessToken: res.accessToken,
-              };
-            });
-            localStorage.setItem("accessToken", res.accessToken);
-            navigate("/home");
-          }
-        } catch (err) {
-          setAuthUser(null);
-          toast.error(err.message, {
-            id: "getToken error",
-          });
-        }
       }
     }
   };
@@ -108,19 +73,19 @@ const Register = () => {
           >
             {/* Name */}
             <div className="form-control min-w-[350px]">
-              <label className="text-left  pb-1">Name</label>
+              <label className="text-left  pb-1">Username</label>
               <input
                 type="text"
                 className={`input input-bordered w-full bg-secondary ${
-                  errors.name && "input-error"
+                  errors.username && "input-error"
                 }`}
-                {...register("name", {
-                  required: "Please enter your name",
+                {...register("username", {
+                  required: "Please enter your username",
                 })}
               />
               {/* Error Message */}
               <p className="text-error text-left pt-2">
-                {errors?.name?.message}
+                {errors?.username?.message}
               </p>
             </div>
 

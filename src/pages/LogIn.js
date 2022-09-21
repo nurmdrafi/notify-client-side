@@ -3,11 +3,10 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import axios from "../api/axios";
 const Login = () => {
-  const { logIn, setAuthUser } = useAuthUserContext();
+  const { setAuthUser } = useAuthUserContext();
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
   const {
     register,
     handleSubmit,
@@ -15,9 +14,9 @@ const Login = () => {
     reset,
   } = useForm();
 
-  // get token
-  const getToken = async (email, password) => {
-    const res = await axiosPrivate.post("/auth/token", {
+  // login
+  const login = async (email, password) => {
+    const res = await axios.post("/auth/login", {
       email: email,
       password: password,
     });
@@ -26,28 +25,20 @@ const Login = () => {
 
   const handleLogin = async (data) => {
     try {
-      await logIn(data.email, data.password);
-      try {
-        const res = await getToken(data.email, data.password);
-        if (res) {
-          // setAuthUser((prev) => {
-          //   return {
-          //     ...prev,
-          //     accessToken: res.accessToken,
-          //   };
-          // });
-          localStorage.setItem("accessToken", res.accessToken);
-          navigate("/home");
-        }
-      } catch (err) {
-        setAuthUser(null);
-        toast.error(err.message, {
-          id: "getToken error",
+      const res = await login(data.email, data.password);
+      if (res) {
+        console.log(res);
+        setAuthUser({
+          username: res.currentUser.username,
+          email: res.currentUser.email,
+          accessToken: res.accessToken,
         });
+        navigate("/home");
       }
     } catch (err) {
       setAuthUser(null);
-      toast.error(err.message, {
+      console.log(err);
+      toast.error(err.response?.data?.message, {
         id: "logIn error",
       });
     }

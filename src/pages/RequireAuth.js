@@ -9,9 +9,9 @@ const RequireAuth = ({ children }) => {
   if (authUser?.email) {
     return children;
   } else {
-    return (
-      <Navigate to="/login" state={{ path: location.pathname }}></Navigate>
-    );
+    return setTimeout(() => {
+      <Navigate to="/login" state={{ path: location.pathname }}></Navigate>;
+    }, 1500);
   }
 };
 
