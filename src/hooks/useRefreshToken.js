@@ -1,8 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import useAuthUserContext from "../context/AuthUserContext";
 
+const logout = async () => {
+  const res = await axios.get("/auth/logout");
+  return res.data;
+};
+
 const useRefreshToken = () => {
   const { setAuthUser } = useAuthUserContext();
+  const navigate = useNavigate();
 
   const refresh = async () => {
     try {
@@ -12,11 +19,15 @@ const useRefreshToken = () => {
       setAuthUser({
         username: response.data.username,
         email: response.data.username,
+        role: response.data.role,
         accessToken: response.data.accessToken,
       });
       return response.data.accessToken;
     } catch (error) {
-      console.log("error refresh token");
+      await logout().then(() => {
+        setAuthUser(null);
+        navigate("/login");
+      });
     }
   };
   return refresh;

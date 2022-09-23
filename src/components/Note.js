@@ -39,7 +39,7 @@ const Note = ({ note, refetch }) => {
           deleteNoteById(id).then(() => refetch());
           Swal.fire("Deleted!", "Your file has been deleted.", "success");
         } catch (err) {
-          console.log(err.message);
+          console.log(err);
         }
       }
     });
@@ -62,7 +62,7 @@ const Note = ({ note, refetch }) => {
           };
           updateNote(note._id, updatedNote).then(() => refetch());
         } catch (err) {
-          console.log(err.message);
+          console.log(err);
         }
         Swal.fire("Saved!", "", "success");
       } else if (result.isDenied) {

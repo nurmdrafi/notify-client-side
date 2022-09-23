@@ -1,5 +1,5 @@
 import axios from "axios";
-const BASE_URL = "https://aqueous-sea-71666.herokuapp.com";
+const BASE_URL = "http://localhost:5000";
 // https://aqueous-sea-71666.herokuapp.com
 // http://localhost:5000
 

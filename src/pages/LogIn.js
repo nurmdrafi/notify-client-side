@@ -4,8 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import axios from "../api/axios";
+import Loading from "../components/Loading";
+
 const Login = () => {
-  const { setAuthUser } = useAuthUserContext();
+  const { setAuthUser, isLoading, setIsLoading } = useAuthUserContext();
   const navigate = useNavigate();
   const {
     register,
@@ -25,25 +27,35 @@ const Login = () => {
 
   const handleLogin = async (data) => {
     try {
-      const res = await login(data.email, data.password);
-      if (res) {
-        console.log(res);
-        setAuthUser({
-          username: res.currentUser.username,
-          email: res.currentUser.email,
-          accessToken: res.accessToken,
+      setIsLoading(true);
+      await login(data.email, data.password)
+        .then((res) => {
+          setAuthUser({
+            username: res?.currentUser?.username,
+            email: res?.currentUser?.email,
+            role: res?.currentUser?.role,
+            accessToken: res?.accessToken,
+          });
+        })
+        .then(() => {
+          setIsLoading(false);
+          navigate("/home");
         });
-        navigate("/home");
-      }
     } catch (err) {
       setAuthUser(null);
-      console.log(err);
       toast.error(err.response?.data?.message, {
         id: "logIn error",
       });
+    } finally {
+      reset();
+      setIsLoading(false);
     }
-    reset();
   };
+  
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className=" flex min-h-[calc(100vh-65px)] items-center justify-center">
       <div>

@@ -4,9 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import axios from "../api/axios";
+import Loading from "../components/Loading";
 
 const Register = () => {
-  const { setIsLoading } = useAuthUserContext();
+  const { isLoading, setIsLoading } = useAuthUserContext();
   const navigate = useNavigate();
   const {
     register,
@@ -38,24 +39,25 @@ const Register = () => {
 
       try {
         setIsLoading(true);
-        const res = await createNewUser(userInfo);
-        reset();
-        // show success message
-        // test.success();
-        console.log(res);
-        if (res) {
+        await createNewUser(userInfo).then(() => {
+          console.log("res");
+          setIsLoading(false);
           navigate("/login");
-        }
+        });
       } catch (err) {
         toast.error(err.response?.data?.message, {
           id: "signUp error",
         });
-        setIsLoading(false);
       } finally {
+        reset();
         setIsLoading(false);
       }
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className=" flex min-h-[calc(100vh-65px)] items-center justify-center">
