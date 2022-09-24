@@ -31,9 +31,10 @@ const CreateNote = ({ closeModal, refetch }) => {
       createNewNote(newNote).then(() => {
         refetch();
       });
+
       closeModal();
     } catch (err) {
-      toast.error(err.message, {
+      toast.error(err.response?.data?.message, {
         id: "createNote error",
       });
     }

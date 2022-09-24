@@ -20,16 +20,21 @@ export const AuthUserContextProvider = ({ children }) => {
           .then((res) => {
             setAuthUser({
               username: res.data.username,
-              email: res.data.username,
+              email: res.data.email,
+              role: res.data.role,
               accessToken: res.data.accessToken,
             });
             navigate("/home");
           });
-      } catch (error) {}
+      } catch (err) {
+        await axios.get("/auth/logout").then(() => {
+          setAuthUser(null);
+          navigate("/login");
+        });
+      }
     };
     refresh();
   }, []);
-
   return (
     <AuthUserContext.Provider
       value={{

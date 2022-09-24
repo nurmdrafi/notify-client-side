@@ -13,16 +13,16 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     try {
-      const response = await axios.get("/auth/refresh", {
+      const res = await axios.get("/auth/refresh", {
         withCredentials: true,
       });
       setAuthUser({
-        username: response.data.username,
-        email: response.data.username,
-        role: response.data.role,
-        accessToken: response.data.accessToken,
+        username: res.data.username,
+        email: res.data.email,
+        role: res.data.role,
+        accessToken: res.data.accessToken,
       });
-      return response.data.accessToken;
+      return res.data.accessToken;
     } catch (error) {
       await logout().then(() => {
         setAuthUser(null);

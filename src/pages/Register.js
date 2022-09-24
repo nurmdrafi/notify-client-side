@@ -40,7 +40,6 @@ const Register = () => {
       try {
         setIsLoading(true);
         await createNewUser(userInfo).then(() => {
-          console.log("res");
           setIsLoading(false);
           navigate("/login");
         });

@@ -31,10 +31,10 @@ const Login = () => {
       await login(data.email, data.password)
         .then((res) => {
           setAuthUser({
-            username: res?.currentUser?.username,
-            email: res?.currentUser?.email,
-            role: res?.currentUser?.role,
-            accessToken: res?.accessToken,
+            username: res.username,
+            email: res.email,
+            role: res.role,
+            accessToken: res.accessToken,
           });
         })
         .then(() => {

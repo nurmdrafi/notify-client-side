@@ -14,13 +14,12 @@ const Navbar = () => {
   };
   const handleLogOut = async () => {
     try {
-      await logout().then((res) => {
-        console.log(res);
+      await logout().then(() => {
         setAuthUser(null);
         navigate("/login");
       });
     } catch (err) {
-      toast.error(err.response?.data?.message, {
+      toast.error(err.response.data.message, {
         id: "logOut error",
       });
     }
