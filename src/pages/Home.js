@@ -13,6 +13,7 @@ const Home = () => {
   const { authUser } = useAuthUserContext();
   const axiosPrivate = useAxiosPrivate();
   const [modalIsOpen, setIsOpen] = useState(false);
+  
 
   // get all notes by userEmail
   async function getNotes() {

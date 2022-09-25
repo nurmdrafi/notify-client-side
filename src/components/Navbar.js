@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuthUserContext from "../context/AuthUserContext";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "../api/axios";
+import { useQueryClient } from "react-query";
 
 const Navbar = () => {
   const { authUser, setAuthUser } = useAuthUserContext();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const logout = async () => {
     const res = await axios.get("/auth/logout");
@@ -15,6 +17,7 @@ const Navbar = () => {
   const handleLogOut = async () => {
     try {
       await logout().then(() => {
+        queryClient.removeQueries("notes");
         setAuthUser(null);
         navigate("/login");
       });
