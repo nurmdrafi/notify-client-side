@@ -1,5 +1,7 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://notify-server-side-tcrr-5qgwy60uo-nurmdrafi.vercel.app";
+// https://notify-server-side-tcrr-5qgwy60uo-nurmdrafi.vercel.app
+// https://notify-server-side-production.up.railway.app
 // https://aqueous-sea-71666.herokuapp.com
 // http://localhost:5000
 
