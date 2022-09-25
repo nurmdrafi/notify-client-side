@@ -25,7 +25,7 @@ const CreateNote = ({ closeModal, refetch }) => {
       title: data.title,
       body: data.body,
       email: authUser.email,
-      time: now.toUTCString(),
+      createdAt: now.toUTCString(),
     };
     try {
       createNewNote(newNote).then(() => {

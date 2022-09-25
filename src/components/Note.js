@@ -12,18 +12,18 @@ const Note = ({ note, refetch }) => {
   const axiosPrivate = useAxiosPrivate();
 
   // delete note by id
-  const deleteNoteById = async (id) => {
-    const res = await axiosPrivate.delete(`/note/delete/${id}`);
+  const deleteNoteById = async (_id) => {
+    const res = await axiosPrivate.delete(`/note/delete/${_id}`);
     return res.data;
   };
 
   // update note
-  const updateNote = async (id, updatedNote) => {
-    const res = await axiosPrivate.patch(`/note/update/${id}`, updatedNote);
+  const updateNote = async (_id, updatedNote) => {
+    const res = await axiosPrivate.patch(`/note/update/${_id}`, updatedNote);
     return res.data;
   };
 
-  const handleDeleteNote = (id) => {
+  const handleDeleteNote = (_id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -36,7 +36,7 @@ const Note = ({ note, refetch }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         try {
-          deleteNoteById(id).then(() => refetch());
+          deleteNoteById(_id).then(() => refetch());
           Swal.fire("Deleted!", "Your file has been deleted.", "success");
         } catch (err) {
           console.log(err);

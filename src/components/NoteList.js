@@ -3,7 +3,7 @@ import Note from "./Note";
 
 const NoteList = ({ notes, refetch }) => {
   const latestNotes = notes.sort((a, b) => {
-    return new Date(b.time) - new Date(a.time);
+    return new Date(b.createdAt) - new Date(a.createdAt);
   });
   return (
     <div>
