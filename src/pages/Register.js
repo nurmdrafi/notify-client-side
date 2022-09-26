@@ -82,6 +82,10 @@ const Register = () => {
                 }`}
                 {...register("username", {
                   required: "Please enter your username",
+                  minLength: {
+                    value: 3,
+                    message: "Your username must have 3 characters",
+                  },
                 })}
               />
               {/* Error Message */}
@@ -124,7 +128,7 @@ const Register = () => {
                   required: "Please enter your password",
                   minLength: {
                     value: 8,
-                    message: "Your pass must have 8 characters",
+                    message: "Your password must have 8 characters",
                   },
                   validate: {
                     whitespace: (v) =>

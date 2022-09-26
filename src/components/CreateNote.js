@@ -20,12 +20,10 @@ const CreateNote = ({ closeModal, refetch }) => {
   };
 
   const handleCreateNote = async (data) => {
-    let now = new Date();
     const newNote = {
       title: data.title,
       body: data.body,
       email: authUser.email,
-      createdAt: now.toUTCString(),
     };
     try {
       createNewNote(newNote).then(() => {
