@@ -1,5 +1,5 @@
 import axios from "axios";
-const BASE_URL = "https://notify-server-side-tcrr.vercel.app";
+const BASE_URL = "http://localhost:5000";
 // https://notify-server-side-tcrr.vercel.app ✔✔✔
 // https://notify-server-side-production.up.railway.app
 // https://aqueous-sea-71666.herokuapp.com

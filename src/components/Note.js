@@ -11,13 +11,13 @@ const Note = ({ note, refetch }) => {
   const [body, setBody] = useState(note.body);
   const axiosPrivate = useAxiosPrivate();
 
-  // delete note by id
+  // delete note by note id
   const deleteNoteById = async (_id) => {
     const res = await axiosPrivate.delete(`/note/delete/${_id}`);
     return res.data;
   };
 
-  // update note
+  // update note by note id
   const updateNote = async (_id, updatedNote) => {
     const res = await axiosPrivate.patch(`/note/update/${_id}`, updatedNote);
     return res.data;
@@ -72,8 +72,12 @@ const Note = ({ note, refetch }) => {
       }
     });
   };
+
   return (
     <div className="card mx-10 mb-10 bg-base-100 shadow-md rounded-none p-6 space-y-3">
+      {note.images.map((url) => {
+        return <img src={url} alt="" srcset="" className="w-16" />;
+      })}
       <div className="flex justify-end">
         {isEditable ? (
           <AiOutlineClose
@@ -82,11 +86,7 @@ const Note = ({ note, refetch }) => {
           />
         ) : (
           <AiOutlineEdit
-            onClick={() => {
-              setIsEditable(true);
-              setTitle(note.title);
-              setBody(note.body);
-            }}
+            onClick={() => {}}
             className="text-primary text-2xl cursor-pointer"
           />
         )}
