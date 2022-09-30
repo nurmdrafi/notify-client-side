@@ -13,7 +13,6 @@ const Home = () => {
   const { authUser } = useAuthUserContext();
   const axiosPrivate = useAxiosPrivate();
   const [modalIsOpen, setIsOpen] = useState(false);
-  
 
   // get all notes by userEmail
   async function getNotes() {
@@ -60,6 +59,7 @@ const Home = () => {
       right: "auto",
       bottom: "auto",
       marginRight: "-50%",
+      width: "60%",
       transform: "translate(-50%, -50%)",
     },
   };
@@ -68,6 +68,7 @@ const Home = () => {
       <div>
         <Toaster position="top-center" reverseOrder={true} />
       </div>
+
       <h1 className="text-center text-black text-3xl font-bold mb-3">
         Hello! {authUser.username}
       </h1>

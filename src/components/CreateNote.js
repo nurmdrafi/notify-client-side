@@ -22,13 +22,6 @@ const CreateNote = ({ closeModal, refetch }) => {
     return res.data;
   };
 
-  // delete from preview
-
-  const deletePreviewImage = (name) => {
-    const filter = images.filter((image) => image.name !== name);
-    setImages(filter);
-  };
-
   // handle create note
   const handleCreateNote = async (e) => {
     e.preventDefault();
@@ -40,37 +33,40 @@ const CreateNote = ({ closeModal, refetch }) => {
       };
       await createNewNote(newNote).then((res) => {
         // handle firebase storage images
-        images.forEach((image) => {
-          // set unique file name
-          const fileExt = image.name.split(".").splice(1);
-          const filePath = `${folderPath}/${
-            image.name.split(".").slice(0, -1).join(".") +
-            "-" +
-            new Date().getTime() +
-            "." +
-            fileExt
-          }`;
+        if (images.length > 0) {
+          images.forEach((image) => {
+            // set unique file name
+            const fileExt = image.name.split(".").splice(1);
+            const filePath = `${folderPath}/${
+              image.name.split(".").slice(0, -1).join(".") +
+              "-" +
+              new Date().getTime() +
+              "." +
+              fileExt
+            }`;
 
-          // set storage path
-          const imageRef = ref(storage, filePath);
+            // set storage path
+            const imageRef = ref(storage, filePath);
 
-          // upload to storage
-          uploadBytes(imageRef, image).then((snapshot) => {
-            // get url
-            getDownloadURL(snapshot.ref).then((url) => {
-              // store url
-              axiosPrivate
-                .post("/file/upload", {
-                  note_id: res.id,
-                  path: filePath,
-                  url,
-                })
-                .then(() => refetch());
+            // upload to storage
+            uploadBytes(imageRef, image).then((snapshot) => {
+              // get url
+              getDownloadURL(snapshot.ref).then(async (url) => {
+                // store url
+                await axiosPrivate
+                  .post("/file/upload", {
+                    note_id: res.id,
+                    path: filePath,
+                    url,
+                  })
+                  .then(() => refetch());
+              });
             });
           });
-        });
+        }
       });
-      await closeModal();
+      closeModal();
+      refetch();
     } catch (err) {
       console.log(err);
       toast.error(err.response?.data?.message, {
@@ -93,6 +89,7 @@ const CreateNote = ({ closeModal, refetch }) => {
       <div>
         <Toaster position="top-center" reverseOrder={true} />
       </div>
+
       <form className=" flex flex-col gap-3" onSubmit={handleCreateNote}>
         {/* Title */}
         <div className="form-control min-w-[350px] max-w-screen-lg">
@@ -117,6 +114,7 @@ const CreateNote = ({ closeModal, refetch }) => {
             ref={bodyRef}
           />
         </div>
+        {/* Select Button */}
         <div className="form-control min-w-[350px] max-w-screen-lg">
           <label
             htmlFor="img"
@@ -144,8 +142,12 @@ const CreateNote = ({ closeModal, refetch }) => {
                     className="w-16 h-16 object-cover border mt-2"
                   />
                   <AiOutlineClose
-                    className="text-primary text-2xl cursor-pointer absolute top-0 right-0"
-                    onClick={() => deletePreviewImage(image.name)}
+                    className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
+                    onClick={() =>
+                      setImages((prev) =>
+                        prev.filter((img) => img.name !== image.name)
+                      )
+                    }
                   />
                 </div>
               );
