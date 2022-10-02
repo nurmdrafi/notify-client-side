@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import RequireAuth from "./pages/RequireAuth";
+import { NoteContextProvider } from "./context/NoteContext";
 
 function App() {
   return (
@@ -17,7 +18,9 @@ function App() {
           path="/home"
           element={
             <RequireAuth>
-              <Home />
+              <NoteContextProvider>
+                <Home />
+              </NoteContextProvider>
             </RequireAuth>
           }
         />

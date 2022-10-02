@@ -8,10 +8,14 @@ import { useQuery } from "react-query";
 import useAuthUserContext from "../context/AuthUserContext";
 import Loading from "../components/Loading";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import SelectImages from "../components/SelectImages";
+import useNoteContext from "../context/NoteContext";
 
 const Home = () => {
   const { authUser } = useAuthUserContext();
   const axiosPrivate = useAxiosPrivate();
+  const { setNewImages, setNewPreviewImages, setUploadedPreviewImages } =
+    useNoteContext();
   const [modalIsOpen, setIsOpen] = useState(false);
 
   // get all notes by userEmail
@@ -51,6 +55,9 @@ const Home = () => {
 
   function closeModal() {
     setIsOpen(false);
+    setNewImages([]);
+    setNewPreviewImages([]);
+    setUploadedPreviewImages([]);
   }
   const customStyles = {
     content: {
@@ -59,7 +66,7 @@ const Home = () => {
       right: "auto",
       bottom: "auto",
       marginRight: "-50%",
-      width: "60%",
+      width: "50%",
       transform: "translate(-50%, -50%)",
     },
   };
@@ -72,6 +79,7 @@ const Home = () => {
       <h1 className="text-center text-black text-3xl font-bold mb-3">
         Hello! {authUser.username}
       </h1>
+      <SelectImages />
 
       {/* Create Note Button */}
       <div className="flex justify-center">

@@ -5,12 +5,12 @@ import "slick-carousel/slick/slick-theme.css";
 const ImageSlider = ({ images }) => {
   const settings = {
     infinite: true,
-    dots: true,
+    fade: true,
     slidesToShow: 1,
     slidesToScroll: 1,
     lazyLoad: true,
-    autoplay: true,
-    autoplaySpeed: 2000,
+    speed: 500,
+    dots: true,
   };
   return (
     <>

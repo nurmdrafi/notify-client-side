@@ -6,19 +6,26 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import Swal from "sweetalert2";
 import useAuthUserContext from "../context/AuthUserContext";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import storage from "../firebase.init";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import useNoteContext from "../context/NoteContext";
 import ImageSlider from "./ImageSlider";
+import { uploadFirebase } from "../utils/handleFirebaseStorage";
 
 const Note = ({ note, refetch }) => {
   const { authUser } = useAuthUserContext();
+  const {
+    newImages,
+    setNewImages,
+    newPreviewImages,
+    setNewPreviewImages,
+    uploadedPreviewImages,
+    setUploadedPreviewImages,
+  } = useNoteContext();
+  const axiosPrivate = useAxiosPrivate();
   const [isEditable, setIsEditable] = useState(false);
   const [title, setTitle] = useState(note.title);
   const [body, setBody] = useState(note.body);
   const [images, setImages] = useState(note.images);
   const [preview, setPreview] = useState(note.images);
-  const axiosPrivate = useAxiosPrivate();
-  const folderPath = `images/${authUser.email}`;
 
   useEffect(() => {
     setImages(note.images);
@@ -29,19 +36,19 @@ const Note = ({ note, refetch }) => {
   const [deleteImages, setDeleteImages] = useState([]);
 
   // add new images list
-  const [addNewImages, setAddNewImages] = useState([]);
+  // const [addNewImages, setAddNewImages] = useState([]);
 
   // add new images preview
-  const [newImagesPreview, setNewImagesPreview] = useState([]);
+  // const [newImagesPreview, setNewImagesPreview] = useState([]);
 
   // preview new added images
-  useEffect(() => {
-    const newImageUrls = [];
-    addNewImages.forEach((image) =>
-      newImageUrls.push({ url: URL.createObjectURL(image), name: image.name })
-    );
-    setNewImagesPreview(newImageUrls);
-  }, [addNewImages]);
+  // useEffect(() => {
+  //   const newImageUrls = [];
+  //   newImages.forEach((image) =>
+  //     newImageUrls.push({ url: URL.createObjectURL(image), name: image.name })
+  //   );
+  //   setNewPreviewImages(newImageUrls);
+  // }, [newImages]);
 
   // delete note by note id
   const deleteNoteById = async (_id) => {
@@ -49,15 +56,21 @@ const Note = ({ note, refetch }) => {
     return res.data;
   };
 
-  // update note by note id
+  // update(text) note by note id
   const updateNote = async (_id, updatedNote) => {
     const res = await axiosPrivate.patch(`/note/update/${_id}`, updatedNote);
     return res.data;
   };
 
   // update note's prev images
-  const updateNotePrevImages = async (_id, url) => {
-    const res = await axiosPrivate.patch("/file/upPrevNoteImg/", { _id, url });
+  const deleteNotePrevImages = async (_id, url) => {
+    const res = await axiosPrivate.patch("/file/delPrevNoteImg/", { _id, url });
+    return res.data;
+  };
+
+  // add from gallery
+  const addFromGallery = async (_id, url) => {
+    const res = await axiosPrivate.patch("/file/addFromGallery", { _id, url });
     return res.data;
   };
 
@@ -73,12 +86,10 @@ const Note = ({ note, refetch }) => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        try {
-          deleteNoteById(_id).then(() => refetch());
-          Swal.fire("Deleted!", "Your file has been deleted.", "success");
-        } catch (err) {
-          console.log(err);
-        }
+        deleteNoteById(_id)
+          .then(() => refetch())
+          .catch((error) => console.log(error));
+        Swal.fire("Deleted!", "Your file has been deleted.", "success");
       }
     });
   };
@@ -91,57 +102,45 @@ const Note = ({ note, refetch }) => {
       showCancelButton: true,
       confirmButtonText: "Save",
       denyButtonText: `Don't save`,
-    }).then(async (result) => {
+    }).then((result) => {
       if (result.isConfirmed) {
-        try {
-          // delete existing note's image
-          if (deleteImages.length > 0) {
-            deleteImages.map(
-              async (url) => await updateNotePrevImages(note._id, url)
-            );
-          }
-          // add new images into note's images
-          if (addNewImages.length > 0) {
-            addNewImages.forEach((image) => {
-              // set unique file name
-              const fileExt = image.name.split(".").splice(1);
-              const filePath = `${folderPath}/${
-                image.name.split(".").slice(0, -1).join(".") +
-                "-" +
-                new Date().getTime() +
-                "." +
-                fileExt
-              }`;
-
-              // set storage path
-              const imageRef = ref(storage, filePath);
-
-              // upload to storage
-              uploadBytes(imageRef, image).then((snapshot) => {
-                // get url
-                getDownloadURL(snapshot.ref).then(async (url) => {
-                  // store url
-                  await axiosPrivate
-                    .post("/file/upload", {
-                      note_id: note._id,
-                      path: filePath,
-                      url,
-                    })
-                    .then(() => refetch());
-                });
-              });
-            });
-            setAddNewImages([]);
-          }
-          const updatedNote = {
-            title: title,
-            body: body,
-          };
-          await updateNote(note._id, updatedNote);
-          await refetch();
-        } catch (err) {
-          console.log(err);
+        // delete existing note's image
+        if (deleteImages.length > 0) {
+          deleteImages.map((url) =>
+            deleteNotePrevImages(note._id, url)
+              .then(() => refetch())
+              .catch((error) => console.log(error))
+          );
         }
+
+        // add new images
+        if (newImages.length > 0) {
+          uploadFirebase(authUser, newImages, note._id, refetch);
+        }
+
+        if (uploadedPreviewImages.length > 0) {
+          uploadedPreviewImages.forEach((url) =>
+            addFromGallery(note._id, url).then(() =>
+              refetch().catch((error) => console.log(error))
+            )
+          );
+        }
+
+        const updatedNote = {
+          title: title,
+          body: body,
+        };
+
+        // if text update
+        updateNote(note._id, updatedNote)
+          .then(() => refetch())
+          .catch((error) => console.log(error));
+
+        setNewImages([]);
+        setNewPreviewImages([]);
+        setUploadedPreviewImages([]);
+        setDeleteImages([]);
+
         Swal.fire("Saved!", "", "success");
       } else if (result.isDenied) {
         setTitle(note.title);
@@ -158,7 +157,13 @@ const Note = ({ note, refetch }) => {
         {isEditable ? (
           <AiOutlineClose
             className="text-primary text-2xl cursor-pointer"
-            onClick={() => setIsEditable(false)}
+            onClick={() => {
+              setIsEditable(false);
+              setNewImages([]);
+              setNewPreviewImages([]);
+              setUploadedPreviewImages([]);
+              setDeleteImages([]);
+            }}
           />
         ) : (
           <AiOutlineEdit
@@ -187,7 +192,7 @@ const Note = ({ note, refetch }) => {
             );
           })}
           {/* new preview images */}
-          {newImagesPreview.map((image, index) => {
+          {newPreviewImages.map((image, index) => {
             return (
               <div key={index} className="inline-block relative">
                 <img
@@ -198,8 +203,29 @@ const Note = ({ note, refetch }) => {
                 <AiOutlineClose
                   className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
                   onClick={() =>
-                    setAddNewImages((prev) =>
+                    setNewImages((prev) =>
                       prev.filter((img) => img.name !== image.name)
+                    )
+                  }
+                />
+              </div>
+            );
+          })}
+          {/* galley images */}
+
+          {uploadedPreviewImages.map((url, index) => {
+            return (
+              <div key={index} className="inline-block relative">
+                <img
+                  src={url}
+                  alt=""
+                  className="w-16 h-16 object-cover border mt-2"
+                />
+                <AiOutlineClose
+                  className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
+                  onClick={() =>
+                    setUploadedPreviewImages((prev) =>
+                      prev.filter((path) => path !== url)
                     )
                   }
                 />
@@ -213,22 +239,8 @@ const Note = ({ note, refetch }) => {
       {/* Select Button */}
       {isEditable && (
         <>
-          <label
-            htmlFor="img"
-            className="custom-file-input"
-            onChange={(e) =>
-              setAddNewImages((prev) => [...prev, ...e.target.files])
-            }
-          >
-            <input
-              type="file"
-              name="image"
-              accept="image/*"
-              multiple
-              placeholder="New Upload"
-              className="hidden"
-              id="img"
-            />
+          <label htmlFor="my-modal" className="btn modal-button">
+            Select Images
           </label>
         </>
       )}
