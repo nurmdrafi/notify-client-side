@@ -7,6 +7,8 @@ export const NoteContextProvider = ({ children }) => {
   const [newImages, setNewImages] = useState([]);
   const [newPreviewImages, setNewPreviewImages] = useState([]);
   const [uploadedPreviewImages, setUploadedPreviewImages] = useState([]);
+  const [status, setStatus] = useState(false);
+
   useEffect(() => {
     const newImageUrls = [];
     newImages.forEach((image) =>
@@ -23,6 +25,8 @@ export const NoteContextProvider = ({ children }) => {
         setNewPreviewImages,
         uploadedPreviewImages,
         setUploadedPreviewImages,
+        status,
+        setStatus,
       }}
     >
       {children}

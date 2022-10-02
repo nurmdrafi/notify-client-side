@@ -7,10 +7,14 @@ import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import RequireAuth from "./pages/RequireAuth";
 import { NoteContextProvider } from "./context/NoteContext";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <div>
+      <div>
+        <Toaster position="top-center" reverseOrder={true} />
+      </div>
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />

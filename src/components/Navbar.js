@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthUserContext from "../context/AuthUserContext";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import axios from "../api/axios";
 import { useQueryClient } from "react-query";
 
@@ -29,9 +29,6 @@ const Navbar = () => {
   };
   return (
     <div className="navbar lg:px-16 px-12 h-[65px]">
-      <div>
-        <Toaster position="top-center" reverseOrder={true} />
-      </div>
       <div className="flex-1">
         <Link className="text-2xl font-bold text-primary" to="/">
           Notify<span className="text-red-500 text-3xl">.</span>me

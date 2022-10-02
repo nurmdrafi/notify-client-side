@@ -14,7 +14,7 @@ const Gallery = () => {
   useEffect(() => {
     const images = [];
     data.map((note) => images.push(...note.images));
-    setGallery(images);
+    setGallery([...new Set(images)]);
   }, [data]);
 
   // check duplicate
@@ -27,7 +27,7 @@ const Gallery = () => {
   };
 
   return (
-    <div className="grid grid-cols-4">
+    <div className="grid grid-cols-4 h-[420px] overflow-y-scroll">
       {gallery.map((url, index) => {
         return (
           <img

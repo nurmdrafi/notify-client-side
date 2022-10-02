@@ -9,6 +9,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useNoteContext from "../context/NoteContext";
 import ImageSlider from "./ImageSlider";
 import { uploadFirebase } from "../utils/handleFirebaseStorage";
+import toast from "react-hot-toast";
 
 const Note = ({ note, refetch }) => {
   const { authUser } = useAuthUserContext();
@@ -35,21 +36,6 @@ const Note = ({ note, refetch }) => {
   // delete images list
   const [deleteImages, setDeleteImages] = useState([]);
 
-  // add new images list
-  // const [addNewImages, setAddNewImages] = useState([]);
-
-  // add new images preview
-  // const [newImagesPreview, setNewImagesPreview] = useState([]);
-
-  // preview new added images
-  // useEffect(() => {
-  //   const newImageUrls = [];
-  //   newImages.forEach((image) =>
-  //     newImageUrls.push({ url: URL.createObjectURL(image), name: image.name })
-  //   );
-  //   setNewPreviewImages(newImageUrls);
-  // }, [newImages]);
-
   // delete note by note id
   const deleteNoteById = async (_id) => {
     const res = await axiosPrivate.delete(`/note/delete/${_id}`);
@@ -63,14 +49,20 @@ const Note = ({ note, refetch }) => {
   };
 
   // update note's prev images
-  const deleteNotePrevImages = async (_id, url) => {
-    const res = await axiosPrivate.patch("/file/delPrevNoteImg/", { _id, url });
+  const deleteNotePrevImages = async (note_id, url) => {
+    const res = await axiosPrivate.patch("/file/delPrevNoteImg/", {
+      note_id,
+      url,
+    });
     return res.data;
   };
 
   // add from gallery
-  const addFromGallery = async (_id, url) => {
-    const res = await axiosPrivate.patch("/file/addFromGallery", { _id, url });
+  const addFromGallery = async (note_id, url) => {
+    const res = await axiosPrivate.patch("/file/addFromGallery", {
+      note_id,
+      url,
+    });
     return res.data;
   };
 
@@ -88,7 +80,11 @@ const Note = ({ note, refetch }) => {
       if (result.isConfirmed) {
         deleteNoteById(_id)
           .then(() => refetch())
-          .catch((error) => console.log(error));
+          .catch((error) =>
+            toast.error(error.response.data.message, {
+              id: "deleteNoteById",
+            })
+          );
         Swal.fire("Deleted!", "Your file has been deleted.", "success");
       }
     });
@@ -106,10 +102,14 @@ const Note = ({ note, refetch }) => {
       if (result.isConfirmed) {
         // delete existing note's image
         if (deleteImages.length > 0) {
-          deleteImages.map((url) =>
+          deleteImages.forEach((url) =>
             deleteNotePrevImages(note._id, url)
               .then(() => refetch())
-              .catch((error) => console.log(error))
+              .catch((error) =>
+                toast.error(error.response.data.message, {
+                  id: "deleteNoteById",
+                })
+              )
           );
         }
 
@@ -120,9 +120,13 @@ const Note = ({ note, refetch }) => {
 
         if (uploadedPreviewImages.length > 0) {
           uploadedPreviewImages.forEach((url) =>
-            addFromGallery(note._id, url).then(() =>
-              refetch().catch((error) => console.log(error))
-            )
+            addFromGallery(note._id, url)
+              .then(() => refetch())
+              .catch((error) =>
+                toast.error(error.response.data.message, {
+                  id: "addFromGallery note",
+                })
+              )
           );
         }
 
@@ -134,7 +138,11 @@ const Note = ({ note, refetch }) => {
         // if text update
         updateNote(note._id, updatedNote)
           .then(() => refetch())
-          .catch((error) => console.log(error));
+          .catch((error) =>
+            toast.error(error.response.data.message, {
+              id: "updateNote",
+            })
+          );
 
         setNewImages([]);
         setNewPreviewImages([]);

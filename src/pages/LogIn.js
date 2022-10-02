@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import useAuthUserContext from "../context/AuthUserContext";
 import axios from "../api/axios";
 import Loading from "../components/Loading";
@@ -58,9 +58,6 @@ const Login = () => {
 
   return (
     <div className=" flex min-h-[calc(100vh-65px)] items-center justify-center">
-      <div>
-        <Toaster />
-      </div>
       <div className="card  w-96 bg-base-100 drop-shadow-lg">
         <div className="card-body items-center text-center">
           <h2 className="card-title text-primary">Login</h2>

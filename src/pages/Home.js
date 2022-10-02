@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import CreateNote from "../components/CreateNote";
 import NoteList from "../components/NoteList";
@@ -14,8 +14,12 @@ import useNoteContext from "../context/NoteContext";
 const Home = () => {
   const { authUser } = useAuthUserContext();
   const axiosPrivate = useAxiosPrivate();
-  const { setNewImages, setNewPreviewImages, setUploadedPreviewImages } =
-    useNoteContext();
+  const {
+    setNewImages,
+    setNewPreviewImages,
+    setUploadedPreviewImages,
+    setStatus,
+  } = useNoteContext();
   const [modalIsOpen, setIsOpen] = useState(false);
 
   // get all notes by userEmail
@@ -55,6 +59,7 @@ const Home = () => {
 
   function closeModal() {
     setIsOpen(false);
+    setStatus(false);
     setNewImages([]);
     setNewPreviewImages([]);
     setUploadedPreviewImages([]);
@@ -72,9 +77,6 @@ const Home = () => {
   };
   return (
     <div className="flex-col min-h-[calc(100vh-65px)] justify-center items-center">
-      <div>
-        <Toaster position="top-center" reverseOrder={true} />
-      </div>
 
       <h1 className="text-center text-black text-3xl font-bold mb-3">
         Hello! {authUser.username}

@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
 import useAuthUserContext from "../context/AuthUserContext";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -16,6 +16,7 @@ const CreateNote = ({ closeModal, refetch }) => {
     setNewPreviewImages,
     uploadedPreviewImages,
     setUploadedPreviewImages,
+    status,
   } = useNoteContext();
   const titleRef = useRef(null);
   const bodyRef = useRef(null);
@@ -26,8 +27,11 @@ const CreateNote = ({ closeModal, refetch }) => {
     return res.data;
   };
 
-  const addFromGallery = async (_id, url) => {
-    const res = await axiosPrivate.patch("/file/addFromGallery", { _id, url });
+  const addFromGallery = async (note_id, url) => {
+    const res = await axiosPrivate.patch("/file/addFromGallery", {
+      note_id,
+      url,
+    });
     return res.data;
   };
 
@@ -46,18 +50,22 @@ const CreateNote = ({ closeModal, refetch }) => {
       }
       if (uploadedPreviewImages.length > 0) {
         uploadedPreviewImages.forEach((url) =>
-          addFromGallery(note.id, url).then(() =>
-            refetch().catch((error) => console.log(error))
-          )
+          addFromGallery(note.id, url)
+            .then(() => refetch())
+            .catch((error) =>
+              toast.error(error.response.data.message, {
+                id: "addFromGallery create",
+              })
+            )
         );
       }
+      refetch();
       setNewImages([]);
       setNewPreviewImages([]);
       setUploadedPreviewImages([]);
       closeModal();
-    } catch (err) {
-      console.log(err);
-      toast.error(err.response?.data?.message, {
+    } catch (error) {
+      toast.error(error.response?.data?.message, {
         id: "createNote error",
       });
     }
@@ -65,10 +73,6 @@ const CreateNote = ({ closeModal, refetch }) => {
 
   return (
     <div className="bg-white">
-      <div>
-        <Toaster position="top-center" reverseOrder={true} />
-      </div>
-
       <form className=" flex flex-col gap-3" onSubmit={handleCreateNote}>
         {/* Title */}
         <div className="form-control min-w-[350px] max-w-screen-lg">
@@ -98,50 +102,53 @@ const CreateNote = ({ closeModal, refetch }) => {
           <label htmlFor="my-modal" className="btn modal-button">
             Select Images
           </label>
+          {status ? (
+            <div className="flex flex-wrap gap-2">
+              {/* new images */}
+              {newPreviewImages.map((image, index) => {
+                return (
+                  <div key={index} className="inline-block relative">
+                    <img
+                      src={image.url}
+                      alt=""
+                      className="w-16 h-16 object-cover border mt-2"
+                    />
+                    <AiOutlineClose
+                      className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
+                      onClick={() =>
+                        setNewImages((prev) =>
+                          prev.filter((img) => img.name !== image.name)
+                        )
+                      }
+                    />
+                  </div>
+                );
+              })}
+              {/* galley images */}
 
-          <div className="flex flex-wrap gap-2">
-            {/* new images */}
-            {newPreviewImages.map((image, index) => {
-              return (
-                <div key={index} className="inline-block relative">
-                  <img
-                    src={image.url}
-                    alt=""
-                    className="w-16 h-16 object-cover border mt-2"
-                  />
-                  <AiOutlineClose
-                    className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
-                    onClick={() =>
-                      setNewImages((prev) =>
-                        prev.filter((img) => img.name !== image.name)
-                      )
-                    }
-                  />
-                </div>
-              );
-            })}
-            {/* galley images */}
-
-            {uploadedPreviewImages.map((url, index) => {
-              return (
-                <div key={index} className="inline-block relative">
-                  <img
-                    src={url}
-                    alt=""
-                    className="w-16 h-16 object-cover border mt-2"
-                  />
-                  <AiOutlineClose
-                    className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
-                    onClick={() =>
-                      setUploadedPreviewImages((prev) =>
-                        prev.filter((path) => path !== url)
-                      )
-                    }
-                  />
-                </div>
-              );
-            })}
-          </div>
+              {uploadedPreviewImages.map((url, index) => {
+                return (
+                  <div key={index} className="inline-block relative">
+                    <img
+                      src={url}
+                      alt=""
+                      className="w-16 h-16 object-cover border mt-2"
+                    />
+                    <AiOutlineClose
+                      className="text-red-600 text-2xl cursor-pointer absolute top-0 right-0"
+                      onClick={() =>
+                        setUploadedPreviewImages((prev) =>
+                          prev.filter((path) => path !== url)
+                        )
+                      }
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
 
         {/* Submit Button */}
